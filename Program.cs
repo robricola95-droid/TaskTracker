@@ -1,22 +1,25 @@
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
+builder.Services.AddDbContext<AppDbContext>();
 
 var app = builder.Build();
 
-var tasks = new List<TaskItem>
+// Create database if it doesn't exist
+using (var scope = app.Services.CreateScope())
 {
-    new TaskItem { Id = 1, Title = "Learn C#", Completed = false },
-    new TaskItem { Id = 2, Title = "Build API", Completed = false }
-};
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.EnsureCreated();
+}
 
-app.MapGet("/api/tasks", () =>
+app.MapGet("/api/tasks", (AppDbContext db) =>
 {
-    return tasks;
+    return db.Tasks.ToList();
 });
 
-app.MapPost("/api/tasks", (TaskItem task) =>
+app.MapPost("/api/tasks", (AppDbContext db, TaskItem task) =>
 {
-    tasks.Add(task);
+    db.Tasks.Add(task);
+    db.SaveChanges();
     return task;
 });
 
