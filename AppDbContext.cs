@@ -1,11 +1,9 @@
-using Microsoft.EntityFrameworkCore;
-
+﻿using Microsoft.EntityFrameworkCore;
 public class AppDbContext : DbContext
 {
     public DbSet<TaskItem> Tasks { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
-        optionsBuilder.UseNpgsql("Host=localhost;Username=postgres;Password=password;Database=tasktracker");
     }
 }
