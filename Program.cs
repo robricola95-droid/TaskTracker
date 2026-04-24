@@ -23,4 +23,15 @@ app.MapPost("/api/tasks", (AppDbContext db, TaskItem task) =>
     return task;
 });
 
+app.MapDelete("/api/tasks/{id}", (AppDbContext db, int id) =>
+{
+    var task = db.Tasks.Find(id);
+    if (task == null)
+        return Results.NotFound();
+    
+    db.Tasks.Remove(task);
+    db.SaveChanges();
+    return Results.Ok();
+});
+
 app.Run();
