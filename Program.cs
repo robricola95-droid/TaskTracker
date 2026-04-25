@@ -12,6 +12,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 var app = builder.Build();
+
 app.UseCors(builder => builder
     .AllowAnyOrigin()
     .AllowAnyMethod()
@@ -27,8 +28,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"DB init warning (non-critical): {ex.Message}");
-        // Continue anyway - table might already exist
+        Console.WriteLine($"DB init warning: {ex.Message}");
     }
 }
 
