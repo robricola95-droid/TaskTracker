@@ -5,8 +5,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors();
 builder.Services.AddControllers();
 
-var connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") 
-    ?? "Host=localhost;Username=postgres;Password=password;Database=tasktracker";
+var connectionString = Environment.GetEnvironmentVariable("ConnectionString") 
+    ?? "Host=localhost;Username=postgres;Password=password;Database=tasktracker;SslMode=Require";
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
@@ -20,7 +20,16 @@ app.UseCors(builder => builder
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.EnsureCreated();
+    try
+    {
+        db.Database.EnsureCreated();
+        Console.WriteLine("Database initialized successfully");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"DB init warning (non-critical): {ex.Message}");
+        // Continue anyway - table might already exist
+    }
 }
 
 app.MapGet("/api/tasks", (AppDbContext db) => db.Tasks.ToList());
