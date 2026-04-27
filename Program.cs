@@ -32,20 +32,68 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.MapGet("/api/tasks", (AppDbContext db) => db.Tasks.ToList());
+app.MapGet("/api/tasks", (AppDbContext db) =>
+{
+    try
+    {
+        return Results.Ok(db.Tasks.ToList());
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"GET error: {ex.Message}");
+        return Results.StatusCode(500);
+    }
+});
+
 app.MapPost("/api/tasks", (AppDbContext db, TaskItem task) =>
 {
-    db.Tasks.Add(task);
-    db.SaveChanges();
-    return task;
+    try
+    {
+        task.Id = 0;
+        db.Tasks.Add(task);
+        db.SaveChanges();
+        return Results.Created($"/api/tasks/{task.Id}", task);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"POST error: {ex.Message}");
+        return Results.StatusCode(500);
+    }
 });
+
+app.MapPut("/api/tasks/{id}", (AppDbContext db, int id, TaskItem updateTask) =>
+{
+    try
+    {
+        var task = db.Tasks.Find(id);
+        if (task == null) return Results.NotFound();
+        task.Completed = updateTask.Completed;
+        task.Title = updateTask.Title;
+        db.SaveChanges();
+        return Results.Ok(task);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"PUT error: {ex.Message}");
+        return Results.StatusCode(500);
+    }
+});
+
 app.MapDelete("/api/tasks/{id}", (AppDbContext db, int id) =>
 {
-    var task = db.Tasks.Find(id);
-    if (task == null) return Results.NotFound();
-    db.Tasks.Remove(task);
-    db.SaveChanges();
-    return Results.Ok();
+    try
+    {
+        var task = db.Tasks.Find(id);
+        if (task == null) return Results.NotFound();
+        db.Tasks.Remove(task);
+        db.SaveChanges();
+        return Results.Ok();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"DELETE error: {ex.Message}");
+        return Results.StatusCode(500);
+    }
 });
 
 app.Urls.Add("http://0.0.0.0:5116");
