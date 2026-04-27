@@ -1,8 +1,8 @@
 # Stop TaskTracker (run when you're done to save money)
 param(
-    [string]$ResourceGroup = "YOUR_RESOURCE_GROUP",
+    [string]$ResourceGroup = "tasktracker-rg",
     [string]$ContainerApp  = "tasktracker-api",
-    [string]$DbServer      = "YOUR_POSTGRES_SERVER_NAME"
+    [string]$DbServer      = "robricola95-tasktracker-db"
 )
 
 Write-Host "Stopping TaskTracker..." -ForegroundColor Cyan
