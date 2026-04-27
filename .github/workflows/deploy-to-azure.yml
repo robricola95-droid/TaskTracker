@@ -79,12 +79,11 @@ jobs:
               --max-replicas 3 \
               --env-vars ConnectionString="${{ secrets.DATABASE_CONNECTION_STRING }}"
           else
-            echo "Updating Container App..."
+            echo "Updating Container App image only (env vars preserved)..."
             az containerapp update \
               --name ${{ env.CONTAINER_APP_NAME }} \
               --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
-              --image ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-              --set-env-vars ConnectionString="${{ secrets.DATABASE_CONNECTION_STRING }}"
+              --image ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           fi
 
       - name: Print live URL
